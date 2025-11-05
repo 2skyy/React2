@@ -1,119 +1,178 @@
-strict - next.js의 기본 eslint 구성과 더욱 엄격한 cor
+<h1>202230231 이하늘</h1>
+<hr>
 
-import 및 모듈의 절대 경로 별칭 설정
+## 11월 5일 (11주차)
 
-next.js에는 tsconfig.json 파일의 "paths" 및 b
+<h2>데이터 가져오기<h2>
 
-자동 셍성되는 항목
-package.json 파일에 scripts 자동 추가 / public 디렉토리
-TypeScript 사용(선택) : tsconfig.json 파일 생성
-Eslint 설정 (선택) : eslintrc.json 대신 eslint.config.mjs 파일 생성
-Tailwind CSS 사용 (선택)
-src 디렉토리 사용 (선택)
-App Router(선택), app/layout.tsx 파일 및 app/page.tsx
-Turbopack 사용 (선택)
-import alias 사용 (선택) : tsconfig.json에 "paths" 자동 생성.
-수동으로 프로젝트를 생성할 때 추가적으로 해야 하는 작업을 자동으로 처리해 줍니다.
+- fetch 응답은 기본적으로 캐싱되지 않음
+- 개발 중에는 가시성과 디버깅 개선을 위해 fetch 호출을 기록할 수 있음
+- 서버 컴포넌트(Server Component) 는 서버에서 렌더링되므로 ORM이나 데이터베이스 클라이언트를 사용해 안전하게 쿼리 실행 가능
+- 컴포넌트를 비동기 함수로 변환하고 await 호출하면 데이터 처리 가능
+- 클라이언트 컴포넌트(Client Component) 에서 데이터를 가져오는 방법 두 가지: eact의 use Hook SWR 또는 React Query 같은 통신 라이브러리 사용
 
-Core web Vitals
+## 10월 29일 (10주차)
 
-LCP (Largest Contentful Paint) : 뷰포트 내에서 가장 큰 페이지 요소 (큰 텍스트 블록, 이미지 또는 비디오)를 표시하는데 걸리는 시간. \*뷰포트 : 웹페이지 사용자가 별도의 스크롤 동작 없이 볼 수 있는 영역
+<h2>React 19 주요 특징 및 Server Actions</h2>
 
-FID(First Input Delay) : 사용자가 웹페에지와 상호작용을 시도하는 첫 번째 순간부터 웹페이지가 응답하는 시간.
+- React 19에서는 Server Actions와 같은 기능을 통해 서버와 클라이언트의 경계가 명확해짐
+- Server Actions를 통해 클라이언트에서 직접 서버 함수를 호출 가능
+- Server에서 데이터를 받아오고, 그 결과를 클라이언트로 스트리밍하여 렌더링 최적화 가능
+- useOptimistic 훅을 사용하면 서버 응답을 기다리지 않고 UI를 즉시 업데이트하는 낙관적 렌더링 구현 가능
+- Suspense와 함께 사용하면 대기 상태를 효과적으로 처리 가능
 
-CLS(Cumulative Layout Shift) : 방문자에게 콘텐츠가 얼마나 불안정한 지 측정한 값입니다. 페이지에서 갑자기 발생하는 레이아웃의 변경이 얼마나 일어나는지 측정합니다.
-즉, 레이아웃 이동 ( layout shift) 빈도를 측정합닞다.
+<h2>서버 및 클라이언트 컴포넌트 인터리빙</h2>
 
-#실습에 사용할 프로젝트를 생성합니다.
+- Client의 state를 사용하여 표시 여부를 전환하는 모달 컴포넌트 안에 Server에서 데이터를 가져오는 카트 컴포넌트가 있음
+- 모든 Server Component는 서버에서 미리 렌더링되고, Client Component가 렌더링되어야 하는 위치에 대한 참조가 포함됨
 
-공식 문서에는 기본 패키지 관리자를 pnpm을 사용합니다.
-원하는 패키지 관리자 탭을 클릭하면 명령을 확인할 수 있습니다. (npx create-next-app@latest)
-pnpm과 관련한 내용을 뒤에서 설명합니다.
-다음 명령으로 프로젝트를 생성합니다.
+<h2>Context란 무엇인가?</h2>
 
-명령을 실행하면 당므과 같은 8개의 선택 항목이 나옵니다.
+- 전역 상태 관리 도구
+- props drilling 문제 해결
+- React 컴포넌트 간 데이터 공유
+- 클라이언트 컴포넌트에서 사용 가능
+- 서버 컴포넌트에서는 제한적
 
-1. 포로젝트 이름을 입력합니다.
-   2~4 TypeScript, ESLint, Tailwind를 사용할지 선택합니다.
-   5.src/디렉토리를
-   구분/ /src 디렉토리 사용 (추천) /src 디렉토리 미사용
-   구조/ 모든 코드가 src/폴더 안에 들어감 // 코드가 프로젝트 루트에 바로 위치함
-   예/ src/app, src/components, src/lib 등 // app, components, lib등
-   목적/ 코드와 설정 파일을 분리 / 전체가 섞여 있음
+<h2>Context Provider (컨텍스트 제공자)</h2>
 
-#.eslintrc.json vs eslint.config.mjs
+- React Context는 전역 상태를 공유하는 데 사용
+- Server Component에서는 Context가 지원되지 않음
+- Provider Component를 트리 깊숙이 렌더링하는 것이 권장됨
+- 속성 선택자(Attribute Selector)를 이용하면 CSS 충돌을 줄일 수 있음
 
-json은 주석, 변수, 조건문 등을 쓸 수 없기 때문에 복잡한 설정이 어렵습니다.
-(JavaScript Object Notation)
-mjs 는 ESLint가 새롭게 도입한 방식으로, ESM(ECMAScript 모듈) 형식입니다.
-확장자 .mjs는 "module JavaScript" 를 의미합니다.
-ESLint v9 이상에서 공식 권장 방식입니다.
-조건문, 변수 동적 로딩 등 코드처럼 유연한 설정이 가능합니다.
-다른 설정 파일을 import 해서 재사용을 할 수 있습니다.
-프로젝트 규모가 커질수록 유지보수에 유리합니다.
-포멧 / JSON 형식 // JavaScript 모듈
-실행방식/ 정적인 설정파일 // 동적인 설정도 가능 (함수, 변수, 사용 등)
-호환성/ 구버전 ESLint와 호환 // ESLint v9 부터 공식 권장
-특징/ 간단하고 직관적 // 더 유연하고 모듈화 가능
-사용 여부 / 여전히 사용 가능 // 최신 Next.js에서 가능
+---
 
-Next.js와 eslint.config.mjs
+## 10월 17일 (8주차)
 
-Next.js14 이후로는 ESLint 9 와의 호환성을 고려해 최신 권장 방식인 eslint.config.mjs를 사용하는 쪽으로 전환되고 있습니다.
+<h2>3-1. Client Component</h2>
 
-.eslintrc.json도 여전히 지원되므로, 필요한 경우 수동으로 만들거나 마이그레이션해서 사용할 수 있습니다.
+- 브라우저 환경에서 렌더링되는 컴포넌트로 상호작용이 필요한 UI에 사용
+- 상태(state), 이벤트 핸들러(event handler), 브라우저 API 접근 가능
+- 예시: Counter, Like Button
 
-마이그레이션 도구는 아직 공식적으로 제공되지는 않지만, 직접 욺기려면 다음처럼 하면 됩니다.
+<h2>3-2. JS Bundle 크기 줄이기</h2>
 
-json
+- Layout 컴포넌트는 기본적으로 Server Component
+- 대화형이 필요한 일부 요소만 Client Component로 지정
+- `'use client'` 선언을 통해 명시적으로 클라이언트 컴포넌트로 설정
 
-// .eslintrc.json{
-"extends" : " next",
-"rules": {
-"no-console": "warn"
-}
-}
+<h2>3-3. Server ↔ Client Component 관계</h2>
 
-js
+- Server Component는 Client Component를 포함할 수 있으나, 반대는 불가능
+- Client Component는 props를 통해 Server Component 데이터를 전달받음
+- 데이터 직렬화 필요
+- fetch 로직은 Server에서 수행하고 결과만 Client로 전달
 
-// eslint.config.mjs
-import next from 'eslint-config-next';
-export default [
-next(),{
-rules:{
-'no console':'warn',
-}
-}
-]
+---
 
-pnpm은 Performant(효율적인) NPM의 약자로 고성능 Node 패키지 매니저입니다,.
+## 10월 1일 (6주차)
 
-npm, yarn과 같은 목적의 패키지 관리자이지만, 디스크 공간 낭비, 복잡한 의존성 관리, 느린 설치 속도 문제 개선을 위해 개발되었습니다.
-대표적인 특징은 다음과 같습니다.
+<h2>Client-side transitions (클라이언트 측 전환)</h2>
 
-1.  하드 링크(Hard Link) 기반의 효율적인 저장 공간 사용
-    : 패키지를 한 번만 설치하여 글로벌 저장소에 저장하고, 각 프로젝트의 node_modules 디렉토리에는 설치된 패키지에 대한 하드 링크 (또는 심볼릭 링크) 가 생성됩니다.
+- 서버 렌더링 페이지 이동 시 전체 페이지가 다시 로드됨
+- <Link> 컴포넌트를 사용하면 상태 초기화 방지 및 빠른 전환 가능
+- 프리패칭(prefetching)과 스트리밍(streaming)으로 동적 경로에서도 빠른 전환 구현 가능
 
-2.  빠른 패키지 설치 속도 (Performant) :이미 설치된 패키지는 다시 다운로드 하지 않고 재사용하므로, 초기 설치뿐만 아니라 종속성 설치 및 업데이트 할 때도 더 바른 설치가 가능합니다.
+<h2>generateStaticParams 비교</h2>
 
-$ pnpm intall
-$ pnpm add
-$ pnpm remove
-$ pnpm update
+- 없는 경우: slug를 빌드 타임에 알 수 없어 요청마다 동적 렌더링
+- 있는 경우: 정적 HTML + JSON을 빌드 타임에 생성 → SSR 불필요
 
-$ pnpm create next-app@latest
+<h2>느린 네트워크 환경</h2>
 
--npm의 npx 대신 pnpm create을 사용합니다.,
-next-app 명령이 실제로 실행되는 것은 create-next-app 입니다.
-블로그 드 ㅇ에서 pnpm도 create-next-app 이라고 소개하는 경우가 있지만 추천하지는 않습니다.
-$ cd my-app
-서버 실행 : $ pnpm start
+- 프리패칭 완료 전 클릭 시 지연 발생 가능
+- loading.tsx가 즉시 표시되지 않을 수 있음
+- useLinkStatus Hook 사용으로 상태 추적 가능
 
-Hard link vs symbolic link(soft link)
+---
 
-#pnpm의 특징 중에 하드 링크를 사용해서 디스크 공간을 효율적으로 사용할 수 이 ㅆ다고 합니다. 탐색기에서 npm과 pnpm프로젝트의 node.module의 용량을 확인해 보세요. #왜 효율적이라 한 것일까요 ?
+## 9월 24일 (5주차)
 
-원본과 하드링크는 같은 것 입니다.
+<h2>searchParams란?</h2>
 
-soft 공유하지 않고 경로 문자열을 저장해두는 특수 파일입니다.(바로가기초롬) 따라서 심볼릭 링크를 열면 내부에 적힌 "경로"를 따라가서 원본 파일을 찾습니다.
-원본이 삭제되면 심볼릭 링크는 끊어진 경로가 되므로 더 이상 사용할 수 없습니다.
+- URL 쿼리 문자열을 읽는 방법
+- searchParams는 props로 전달되어 URLSearchParams처럼 동작
+
+<h2>Linking between pages (페이지 간 연결)</h2>
+
+- <Link> 컴포넌트를 사용하여 페이지 간 탐색
+- HTML a 태그를 확장하여 prefetching 및 client-side navigation 제공
+
+<h2>Streaming (스트리밍)</h2>
+
+- 동적 경로 일부를 미리 전송 가능
+- 공유 레이아웃 및 로딩 스켈레톤을 빠르게 렌더링
+
+---
+
+## 9월 17일 (4주차)
+
+<h2>git checkout vs git switch</h2>
+
+- checkout은 브랜치 이동 및 파일 변경 가능 (위험함)
+- switch는 브랜치 이동만 가능 (안전함)
+- switch 사용 권장
+
+<h2>Creating a nested route (중첩 라우트)</h2>
+
+- 폴더 구조를 중첩하여 다중 URL 세그먼트 생성
+- [slug] 폴더를 사용해 동적 경로 구현 가능
+
+<h2>Rendering with search params</h2>
+
+- Server Component에서 searchParams prop을 통해 검색 매개변수 접근 가능
+- 해당 페이지는 동적 렌더링 처리됨
+
+---
+
+## 9월 10일 (3주차)
+
+<h2>Folder and file conventions (폴더 및 파일 규칙)</h2>
+
+- Next.js는 폴더를 URL 세그먼트로 매핑
+- layout은 경로별 공유, template은 새 인스턴스로 초기화
+- Route groups: (폴더명) 형식으로 그룹화 가능
+
+---
+
+## 9월 3일 (2주차)
+
+<h2>Next.js 기본 설정 및 구조</h2>
+
+<h3>strict 모드 및 eslint</h3>
+- Next.js의 기본 ESLint 구성은 엄격한 코드 품질 검사 제공  
+- eslint.config.mjs 사용 권장 (ESLint v9 이상 공식 방식)  
+- .eslintrc.json보다 유연하고 모듈화된 설정 가능
+
+<h3>자동 생성 항목</h3>
+- package.json에 scripts 자동 추가  
+- tsconfig.json / eslint.config.mjs / Tailwind CSS / src 디렉토리 자동 생성 가능  
+- App Router 기본 포함
+
+<h3>Core Web Vitals</h3>
+- LCP: 가장 큰 콘텐츠 표시까지의 시간  
+- FID: 첫 입력 후 응답 시간  
+- CLS: 페이지 레이아웃 이동 빈도
+
+<h3>pnpm 개요</h3>
+- 효율적(Performant) NPM의 약자  
+- 하드링크 기반 저장공간 절약  
+- 빠른 패키지 설치 및 의존성 관리
+
+<h3>Hard Link vs Symbolic Link</h3>
+- 하드링크: 원본과 동일한 파일로 저장  
+- 심볼릭 링크: 원본 경로를 참조 (바로가기와 유사)  
+- 원본 삭제 시 심볼릭 링크는 끊어짐
+
+<h3>용어 정리</h3>
+- route: 경로  
+- routing: 경로 탐색 과정  
+- directory: 상위 폴더, folder: 일반 폴더
+
+---
+
+## 8월 27일 (1주차)
+
+- 오리엔테이션(OT) 진행
+- 개발 환경 및 설치 실습
